@@ -77,13 +77,13 @@
 	デジタル信号処理の授業で習ったこと。
 	\begin{itemize}
 		\item いろいろな直交変換
-		\begin{itemize}
-			\item 離散フーリエ変換
-			\item ウェーブレット変換
-			\item 離散コサイン変換
-			\item ラプラス変換(Z変換)
-		\end{itemize}
-		\item 変換した領域で行う操作
+		      \begin{itemize}
+			      \item 離散フーリエ変換
+			      \item ウェーブレット変換
+			      \item 離散コサイン変換
+			      \item ラプラス変換(Z変換)
+		      \end{itemize}
+		\item 変換した領域で行う操作(おもにフィルタ)
 	\end{itemize}
 
 	今からやることも直交変換して周波数領域でちょっとした操作をするだけです。
@@ -93,6 +93,8 @@
 	\begin{block}{やったこと}
 		画像に秘密データ(文字列)を隠ぺいするプログラムを作りました。
 	\end{block}
+	たいそうな言葉遣いだけど、単に画像にばれないように秘密の印
+	をつけただけ。
 \end{frame}
 
 \begin{frame}\frametitle{経緯}
@@ -128,7 +130,7 @@
 \end{frame}
 
 \begin{frame}\frametitle{画像の読み込み}
-	\begin{block}{}
+	\begin{block}{手順1}
 		2次元のカラー画像を読み込む。
 	\end{block}
 	カラー画像はR,G,Bの3色で表され、
@@ -137,7 +139,7 @@
 \end{frame}
 
 \begin{frame}\frametitle{直交変換}
-	\begin{block}{}
+	\begin{block}{手順2}
 		画像を2次元離散コサイン変換する。
 	\end{block}
 	カラー画像はR成分のみ,G成分のみ,B成分のみの画像に分けて、
@@ -148,10 +150,14 @@
 
 	2次元離散コサイン変換は画像全体を$4\times 4$マスのブロックに分割しておこなった。
 	このブロックの高周波成分を使用して\,1\,bitのデータを入れていく。
+	\begin{exampleblock}{ちょっと一工夫}
+		どうやら人間は寒色に鈍感らしいので、
+		カラー画像のときは青成分だけをいじるようにしました。
+	\end{exampleblock}
 \end{frame}
 
 \begin{frame}\frametitle{データの埋め込み}
-	\begin{block}{}
+	\begin{block}{手順3}
 		高周波領域にデータを埋め込む。
 	\end{block}
 	2次元離散コサイン変換をすると高周波成分は右下に出てくるので、
@@ -164,7 +170,7 @@
 \end{frame}
 
 \begin{frame}\frametitle{逆変換}
-	\begin{block}{}
+	\begin{block}{手順4}
 		逆変換して画像に戻す。
 	\end{block}
 	2次元離散コサイン逆変換をする。
@@ -173,6 +179,76 @@
 	縦・横という順で変換をしたならば横・縦という順で逆変換を施す。
 
 	画像に戻って出来上がり！
+\end{frame}
+
+\section{結果}
+\begin{frame}\frametitle{結果(1)}
+	右側が情報を埋めた画像。符号誤り率は\,0/49152\,だった。
+
+	\begin{figure}[htbp]
+		\begin{center}
+			\begin{tabular}{c}
+
+				% 1
+				\begin{minipage}{0.5\hsize}
+					\begin{center}
+						\includegraphics[clip, width=4.5cm]{Nara.jpg}
+						\hspace{1.6cm} [1]\ 元データ
+					\end{center}
+				\end{minipage}
+
+				% 2
+				\begin{minipage}{0.5\hsize}
+					\begin{center}
+						\includegraphics[clip, width=4.5cm]{StegoNara.png}
+						\hspace{1.6cm} [2]\ 後データ
+					\end{center}
+				\end{minipage}
+			\end{tabular}
+			\caption{奈良公園の鹿}
+			\label{fig:nara}
+		\end{center}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{結果(2)}
+	ただし、下のような激しい画像では符号誤り率は\,2343/24360\,だった。
+
+	\begin{figure}[htbp]
+		\begin{center}
+			\begin{tabular}{c}
+
+				% 1
+				\begin{minipage}{0.5\hsize}
+					\begin{center}
+						\includegraphics[clip, width=4.5cm]{Test.png}
+						\hspace{1.6cm} [1]\ 元データ
+					\end{center}
+				\end{minipage}
+
+				% 2
+				\begin{minipage}{0.5\hsize}
+					\begin{center}
+						\includegraphics[clip, width=4.5cm]{StegoTest.png}
+						\hspace{1.6cm} [2]\ 後データ
+					\end{center}
+				\end{minipage}
+			\end{tabular}
+			\caption{よくない画像}
+			\label{fig:test}
+		\end{center}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{まとめ}
+	\begin{itemize}
+		\item 一般的な画像であれば誤りも少なく情報を埋め込むことがえできた。
+		\item ぐちゃぐちゃな画像では誤りが大きくなってあまり実用的ではない。
+	\end{itemize}
+	\begin{alertblock}{注意}
+		そもそも明らかに怪しい意味のよくわからない混沌とした画像を\,StegoBox\,
+		に選ぶこと自体がよくないので、普通の画像を選びましょう。
+	\end{alertblock}
 \end{frame}
 
 \section{デモンストレーション}
